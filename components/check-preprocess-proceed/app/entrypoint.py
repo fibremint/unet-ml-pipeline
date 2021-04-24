@@ -21,10 +21,10 @@ def main(args):
                                        if slide_file_path.split(os.path.sep)[-1] not in preprocessed_checkpoint]
 
     is_preprocess_required = len(preprocess_required_slide_paths) != 0
-    with open('/tmp/is-preprocess-required', 'w') as f:
+    with open('/tmp/is-preprocess-required.txt', 'w') as f:
         f.write(str(is_preprocess_required))
 
-    with open('/tmp/preprocess-required-slide-paths', 'w') as f:
+    with open('/tmp/preprocess-required-slide-paths.json', 'w') as f:
         f.write(json.dumps(preprocess_required_slide_paths))
 
 
