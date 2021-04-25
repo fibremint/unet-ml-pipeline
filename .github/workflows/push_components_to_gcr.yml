@@ -39,7 +39,7 @@ jobs:
       - uses: marceloprado/has-changed-path@v1
         id: changed-check-deployable
         with: 
-          path: components/check-deployable
+          paths: components/check-deployable
         
       - name: 'Check updated: check-deployable'
         if: steps.changed-check-deployable.outpus.changed == 'true'
@@ -48,7 +48,7 @@ jobs:
       - uses: marceloprado/has-changed-path@v1
         id: changed-check-preprocess-proceed
         with: 
-          path: components/check-preprocess-proceed
+          paths: components/check-preprocess-proceed
           
       - name: 'Check updated: check-preprocess-proceed'
         if: steps.changed-check-preprocess-proceed.outputs.changed == 'true'
@@ -57,7 +57,7 @@ jobs:
       - uses: marceloprado/has-changed-path@v1
         id: changed-data-preprocess
         with: 
-          path: components/data-preprocess
+          paths: components/data-preprocess
       
       - name: 'Check updated: data-preprocess'
         if: steps.changed-data-preprocess.outputs.changed == 'true'
@@ -66,7 +66,7 @@ jobs:
       - uses: marceloprado/has-changed-path@v1
         id: changed-deploy
         with: 
-          path: components/deploy
+          paths: components/deploy
           
       - name: 'Check updated: deploy'
         if: steps.changed-deploy.outputs.changed == 'true'
@@ -75,7 +75,7 @@ jobs:
       - uses: marceloprado/has-changed-path@v1
         id: changed-evaluate
         with: 
-          path: components/evaluate
+          paths: components/evaluate
           
       - name: 'Check updated: evaluate'
         if: steps.changed-evaluate.outputs.changed == 'true'
@@ -84,7 +84,7 @@ jobs:
       - uses: marceloprado/has-changed-path@v1
         id: changed-train
         with: 
-          path: components/train
+          paths: components/train
           
       - name: 'Check updated: train'
         if: steps.changed-train.outputs.changed == 'true'
@@ -93,7 +93,7 @@ jobs:
       - uses: marceloprado/has-changed-path@v1
         id: changed-update-deploy-config
         with: 
-          path: components/update-deploy-config
+          paths: components/update-deploy-config
           
       - name: 'Check updated: update-deploy-config'
         if: steps.changed-update-deploy-config.outputs.changed == 'true'
