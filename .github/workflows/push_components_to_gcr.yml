@@ -1,0 +1,115 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Push changed components to Google Container Registry
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 100
+          path: main
+          
+      # setup gcloud CLI
+      - name: Setup GCP CLI
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+          
+      - uses: marceloprado/has-changed-path@v1
+        id: changed-check-deployable
+        with: 
+          path: components/check-deployable
+        
+      - name: 'Check updated: check-deployable'
+        if: steps.changed-check-deployable.outpus.changed == 'true'
+        run: export UPDATED_COMPONENTS="check-deployable $UPDATED_COMPONENTS"
+          
+      - uses: marceloprado/has-changed-path@v1
+        id: changed-check-preprocess-proceed
+        with: 
+          path: components/check-preprocess-proceed
+          
+      - name: 'Check updated: check-preprocess-proceed'
+        if: steps.changed-check-preprocess-proceed.outputs.changed == 'true'
+        run: export UPDATED_COMPONENTS="check-preprocess-proceed $UPDATED_COMPONENTS"
+          
+      - uses: marceloprado/has-changed-path@v1
+        id: changed-data-preprocess
+        with: 
+          path: components/data-preprocess
+      
+      - name: 'Check updated: data-preprocess'
+        if: steps.changed-data-preprocess.outputs.changed == 'true'
+        run: export UPDATED_COMPONENTS="data-preprocess $UPDATED_COMPONENTS"
+          
+      - uses: marceloprado/has-changed-path@v1
+        id: changed-deploy
+        with: 
+          path: components/deploy
+          
+      - name: 'Check updated: deploy'
+        if: steps.changed-deploy.outputs.changed == 'true'
+        run: export UPDATED_COMPONENTS="deploy $UPDATED_COMPONENTS"
+          
+      - uses: marceloprado/has-changed-path@v1
+        id: changed-evaluate
+        with: 
+          path: components/evaluate
+          
+      - name: 'Check updated: evaluate'
+        if: steps.changed-evaluate.outputs.changed == 'true'
+        run: export UPDATED_COMPONENTS="evaluate $UPDATED_COMPONENTS" 
+      
+      - uses: marceloprado/has-changed-path@v1
+        id: changed-train
+        with: 
+          path: components/train
+          
+      - name: 'Check updated: train'
+        if: steps.changed-train.outputs.changed == 'true'
+        run: export UPDATED_COMPONENTS="train $UPDATED_COMPONENTS" 
+      
+      - uses: marceloprado/has-changed-path@v1
+        id: changed-update-deploy-config
+        with: 
+          path: components/update-deploy-config
+          
+      - name: 'Check updated: update-deploy-config'
+        if: steps.changed-update-deploy-config.outputs.changed == 'true'
+        run: export UPDATED_COMPONENTS="update-deploy-config $UPDATED_COMPONENTS"
+          
+      - name: Show updated components
+        run: |
+          echo $UPDATED_COMPONENTS
+      # Runs a single command using the runners shell
+#       - name: Run a one-line script
+#         run: echo Hello, world!
+
+#       # Runs a set of commands using the runners shell
+#       - name: Run a multi-line script
+#         run: |
+#           echo Add other actions to build,
+#           echo test, and deploy your project.
+          
+    
