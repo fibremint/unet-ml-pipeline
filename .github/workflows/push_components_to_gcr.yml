@@ -44,7 +44,7 @@ jobs:
               - 'components/evaluate/**'
             train:
               - 'components/train/**'
-            update-deploy-config
+            update-deploy-config:
               - 'components/update-deploy-config/**'
     
   # This workflow contains a single job called "build"
