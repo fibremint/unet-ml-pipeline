@@ -6,7 +6,7 @@ name: Push changed components to Google Container Registry
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
     branches: [ master ]
 
@@ -15,93 +15,149 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  check-updated-components:
+    name: Check component updates
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.filter.outputs.changes }}
+#       check-deployable: ${{ steps.component-updates.outputs.check-deployable }}
+#       check-preprocess-proceed: ${{ steps.component-updates.outputs.check-preprocess-proceed }}
+#       data-preprocess: ${{ steps.component-updates.outputs.data-preprocess }}
+#       deploy: ${{ steps.component-updates.outputs.deploy }}
+#       evaluate: ${{ steps.component-updates.outputs.evaluate }}
+#       train: ${{ steps.component-updates.outputs.train }}
+#       update-deploy-config: ${{ steps.component-updates.outputs.update-deploy-config }}
+    steps:
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with: 
+          filters: |
+            check-deployable:
+              - 'components/check-deployable/**'
+            check-preprocess-proceed:
+              - 'components/check-preprocess-proceed/**'
+            data-preprocess:
+              - 'components/data-preprocess/**'
+            deploy:
+              - 'components/deploy/**'
+            evlauate:
+              - 'components/evaluate/**'
+            train:
+              - 'components/train/**'
+            update-deploy-config:
+              - 'components/update-deploy-config/**'
+    
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
+    needs: check-updated-components
+    strategy:
+      matrix: 
+        package: ${{ fromJSON(needs.check-updated-components.outputs.packages) }}
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 100
-          path: main
+      
+      - name: test
+        run: 
+          echo ${{ matrix.package }}
           
       # setup gcloud CLI
-      - name: Setup GCP CLI
-        uses: google-github-actions/setup-gcloud@master
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
+#       - name: Setup GCP CLI
+#         uses: google-github-actions/setup-gcloud@master
+#         with:
+#           project_id: ${{ secrets.GCP_PROJECT_ID }}
+#           service_account_key: ${{ secrets.GCP_SA_KEY }}
+#           export_default_credentials: true
           
-      - uses: marceloprado/has-changed-path@v1
-        id: changed-check-deployable
-        with: 
-          paths: packages/components/check-deployable
+#       - name: Check updated components
+#         uses: dorny/paths-filter@v2
+#         id: updated-components
+#         with:
+#           filters: |
+#             check-deployable:
+#               - 'components/check-deployable/**'
+#             check-preprocess-proceed:
+#               - 'components/check-preprocess-proceed/**'
+#             data-preprocess:
+#               - 'components/data-preprocess'
+#             deploy:
+#               - 'components/deploy'
+#             evlauate:
+#               - 'components/evaluate'
+#             train:
+#               - 'components/train'
+#             update-deploy-config
+#               - 'components/update-deploy-config'
+          
+#       - uses: marceloprado/has-changed-path@v1
+#         id: changed-check-deployable
+#         with: 
+#           paths: components/check-deployable
         
-      - name: 'Check updated: check-deployable'
-        if: steps.changed-check-deployable.outpus.changed == 'true'
-        run: export UPDATED_COMPONENTS="check-deployable $UPDATED_COMPONENTS"
+#       - name: 'Check updated: check-deployable'
+#         if: steps.changed-check-deployable.outpus.changed == 'true'
+#         run: export UPDATED_COMPONENTS="check-deployable $UPDATED_COMPONENTS"
           
-      - uses: marceloprado/has-changed-path@v1
-        id: changed-check-preprocess-proceed
-        with: 
-          paths: packages/components/check-preprocess-proceed
+#       - uses: marceloprado/has-changed-path@v1
+#         id: changed-check-preprocess-proceed
+#         with: 
+#           paths: components/check-preprocess-proceed
           
-      - name: 'Check updated: check-preprocess-proceed'
-        if: steps.changed-check-preprocess-proceed.outputs.changed == 'true'
-        run: export UPDATED_COMPONENTS="check-preprocess-proceed $UPDATED_COMPONENTS"
+#       - name: 'Check updated: check-preprocess-proceed'
+#         if: steps.changed-check-preprocess-proceed.outputs.changed == 'true'
+#         run: export UPDATED_COMPONENTS="check-preprocess-proceed $UPDATED_COMPONENTS"
           
-      - uses: marceloprado/has-changed-path@v1
-        id: changed-data-preprocess
-        with: 
-          paths: packages/components/data-preprocess
+#       - uses: marceloprado/has-changed-path@v1
+#         id: changed-data-preprocess
+#         with: 
+#           paths: components/data-preprocess
       
-      - name: 'Check updated: data-preprocess'
-        if: steps.changed-data-preprocess.outputs.changed == 'true'
-        run: export UPDATED_COMPONENTS="data-preprocess $UPDATED_COMPONENTS"
+#       - name: 'Check updated: data-preprocess'
+#         if: steps.changed-data-preprocess.outputs.changed == 'true'
+#         run: export UPDATED_COMPONENTS="data-preprocess $UPDATED_COMPONENTS"
           
-      - uses: marceloprado/has-changed-path@v1
-        id: changed-deploy
-        with: 
-          paths: packages/components/deploy
+#       - uses: marceloprado/has-changed-path@v1
+#         id: changed-deploy
+#         with: 
+#           paths: components/deploy
           
-      - name: 'Check updated: deploy'
-        if: steps.changed-deploy.outputs.changed == 'true'
-        run: export UPDATED_COMPONENTS="deploy $UPDATED_COMPONENTS"
+#       - name: 'Check updated: deploy'
+#         if: steps.changed-deploy.outputs.changed == 'true'
+#         run: export UPDATED_COMPONENTS="deploy $UPDATED_COMPONENTS"
           
-      - uses: marceloprado/has-changed-path@v1
-        id: changed-evaluate
-        with: 
-          paths: packages/components/evaluate
+#       - uses: marceloprado/has-changed-path@v1
+#         id: changed-evaluate
+#         with: 
+#           paths: components/evaluate
           
-      - name: 'Check updated: evaluate'
-        if: steps.changed-evaluate.outputs.changed == 'true'
-        run: export UPDATED_COMPONENTS="evaluate $UPDATED_COMPONENTS" 
+#       - name: 'Check updated: evaluate'
+#         if: steps.changed-evaluate.outputs.changed == 'true'
+#         run: export UPDATED_COMPONENTS="evaluate $UPDATED_COMPONENTS" 
       
-      - uses: marceloprado/has-changed-path@v1
-        id: changed-train
-        with: 
-          paths: packages/components/train
+#       - uses: marceloprado/has-changed-path@v1
+#         id: changed-train
+#         with: 
+#           paths: components/train
           
-      - name: 'Check updated: train'
-        if: steps.changed-train.outputs.changed == 'true'
-        run: export UPDATED_COMPONENTS="train $UPDATED_COMPONENTS" 
+#       - name: 'Check updated: train'
+#         if: steps.changed-train.outputs.changed == 'true'
+#         run: export UPDATED_COMPONENTS="train $UPDATED_COMPONENTS" 
       
-      - uses: marceloprado/has-changed-path@v1
-        id: changed-update-deploy-config
-        with: 
-          paths: packages/components/update-deploy-config
+#       - uses: marceloprado/has-changed-path@v1
+#         id: changed-update-deploy-config
+#         with: 
+#           paths: components/update-deploy-config
           
-      - name: 'Check updated: update-deploy-config'
-        if: steps.changed-update-deploy-config.outputs.changed == 'true'
-        run: export UPDATED_COMPONENTS="update-deploy-config $UPDATED_COMPONENTS"
+#       - name: 'Check updated: update-deploy-config'
+#         if: steps.changed-update-deploy-config.outputs.changed == 'true'
+#         run: export UPDATED_COMPONENTS="update-deploy-config $UPDATED_COMPONENTS"
           
-      - name: Show updated components
-        run: |
-          echo $UPDATED_COMPONENTS
+#       - name: Show updated components
+#         run: |
+#           echo $UPDATED_COMPONENTS
       # Runs a single command using the runners shell
 #       - name: Run a one-line script
 #         run: echo Hello, world!
