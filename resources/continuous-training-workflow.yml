@@ -1,0 +1,8 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  namespace: argo
+  generateName: continuous-training-pipeline-
+spec:
+  WorkflowTemplateRef:
+    name: continuous-training-template
