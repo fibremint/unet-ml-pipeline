@@ -51,6 +51,7 @@ jobs:
           echo UPDATED: $UPDATED
           if [ "[]" == "$UPDATED" ]; then echo "empty"
           else echo "not empty"
+          fi
     
   # This workflow contains a single job called "build"
   build:
