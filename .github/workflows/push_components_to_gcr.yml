@@ -1,10 +1,7 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Push changed components to Google Container Registry
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
      paths:
        - 'components/**'
@@ -13,13 +10,6 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
-# env:
-#   REPO_BASE: ${{ secrets.REPO_BASE }}
-#   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-#   IMAGE_NS: nwd
-#   GITHUB_SHA: ${{ github.sha }}
-#   GITHUB_REF: ${{ github.ref }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -61,7 +51,6 @@ jobs:
           else echo "::set-output name=is_none_of_updates::false"
           fi
 
-  # This workflow contains a single job called "build"
   build-push:
     name: Build and push the image
     runs-on: ubuntu-latest
@@ -73,22 +62,14 @@ jobs:
         package: ${{ fromJSON(needs.check-updated-components.outputs.packages) }}
 
     env:
-#      REPO_BASE: ${{ secrets.REPO_BASE }}
-#      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       IMAGE_NS: nwd
       GITHUB_SHA: ${{ github.sha }}
       GITHUB_REF: ${{ github.ref }}
-#      IMAGE: ${{ secrets.REPO_BASE }}/${{ secrets.GCP_PROJECT_ID }}/"$IMAGE_NS"-${{ matrix.package }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-#       - name: test
-#         run:
-#           echo "is not empty"
-#           echo ${{ matrix.package }}
 
       # setup gcloud CLI
       - name: Setup GCP CLI
@@ -108,12 +89,6 @@ jobs:
           echo $GITHUB_REF | awk -F/ '{print $NF}' > TAG
           echo ${{ secrets.REPO_BASE }}/${{ secrets.GCP_PROJECT_ID }}/"$IMAGE_NS"-${{ matrix.package }} > IMAGE
 
-      - name: Show directory
-        run: |
-          pwd
-          ls -al
-
-
       # Build the docker image
       - name: Build
         run: |
@@ -122,106 +97,10 @@ jobs:
             --build-arg GITHUB_SHA="$GITHUB_SHA" \
             --build-arg GITHUB_REF="$GITHUB_REF"
 
+      # Push to Google Container Registry
       - name: Publish
         run: |
           docker push $(cat IMAGE):$(cat TAG)
           docker tag $(cat IMAGE):$(cat TAG) \
                      $(cat IMAGE):latest
           docker push $(cat IMAGE):latest
-#       - name: Check updated components
-#         uses: dorny/paths-filter@v2
-#         id: updated-components
-#         with:
-#           filters: |
-#             check-deployable:
-#               - 'components/check-deployable/**'
-#             check-preprocess-proceed:
-#               - 'components/check-preprocess-proceed/**'
-#             data-preprocess:
-#               - 'components/data-preprocess'
-#             deploy:
-#               - 'components/deploy'
-#             evlauate:
-#               - 'components/evaluate'
-#             train:
-#               - 'components/train'
-#             update-deploy-config
-#               - 'components/update-deploy-config'
-          
-#       - uses: marceloprado/has-changed-path@v1
-#         id: changed-check-deployable
-#         with: 
-#           paths: components/check-deployable
-        
-#       - name: 'Check updated: check-deployable'
-#         if: steps.changed-check-deployable.outpus.changed == 'true'
-#         run: export UPDATED_COMPONENTS="check-deployable $UPDATED_COMPONENTS"
-          
-#       - uses: marceloprado/has-changed-path@v1
-#         id: changed-check-preprocess-proceed
-#         with: 
-#           paths: components/check-preprocess-proceed
-          
-#       - name: 'Check updated: check-preprocess-proceed'
-#         if: steps.changed-check-preprocess-proceed.outputs.changed == 'true'
-#         run: export UPDATED_COMPONENTS="check-preprocess-proceed $UPDATED_COMPONENTS"
-          
-#       - uses: marceloprado/has-changed-path@v1
-#         id: changed-data-preprocess
-#         with: 
-#           paths: components/data-preprocess
-      
-#       - name: 'Check updated: data-preprocess'
-#         if: steps.changed-data-preprocess.outputs.changed == 'true'
-#         run: export UPDATED_COMPONENTS="data-preprocess $UPDATED_COMPONENTS"
-          
-#       - uses: marceloprado/has-changed-path@v1
-#         id: changed-deploy
-#         with: 
-#           paths: components/deploy
-          
-#       - name: 'Check updated: deploy'
-#         if: steps.changed-deploy.outputs.changed == 'true'
-#         run: export UPDATED_COMPONENTS="deploy $UPDATED_COMPONENTS"
-          
-#       - uses: marceloprado/has-changed-path@v1
-#         id: changed-evaluate
-#         with: 
-#           paths: components/evaluate
-          
-#       - name: 'Check updated: evaluate'
-#         if: steps.changed-evaluate.outputs.changed == 'true'
-#         run: export UPDATED_COMPONENTS="evaluate $UPDATED_COMPONENTS" 
-      
-#       - uses: marceloprado/has-changed-path@v1
-#         id: changed-train
-#         with: 
-#           paths: components/train
-          
-#       - name: 'Check updated: train'
-#         if: steps.changed-train.outputs.changed == 'true'
-#         run: export UPDATED_COMPONENTS="train $UPDATED_COMPONENTS" 
-      
-#       - uses: marceloprado/has-changed-path@v1
-#         id: changed-update-deploy-config
-#         with: 
-#           paths: components/update-deploy-config
-          
-#       - name: 'Check updated: update-deploy-config'
-#         if: steps.changed-update-deploy-config.outputs.changed == 'true'
-#         run: export UPDATED_COMPONENTS="update-deploy-config $UPDATED_COMPONENTS"
-          
-#       - name: Show updated components
-#         run: |
-#           echo $UPDATED_COMPONENTS
-      # Runs a single command using the runners shell
-#       - name: Run a one-line script
-#         run: echo Hello, world!
-
-#       # Runs a set of commands using the runners shell
-#       - name: Run a multi-line script
-#         run: |
-#           echo Add other actions to build,
-#           echo test, and deploy your project.
-          
-    
