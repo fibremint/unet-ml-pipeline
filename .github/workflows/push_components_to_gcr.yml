@@ -6,6 +6,8 @@ name: Push changed components to Google Container Registry
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
+#     paths:
+#       - 'components/**'
     branches: [ master, dev ]
   pull_request:
     branches: [ master ]
@@ -20,13 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       packages: ${{ steps.filter.outputs.changes }}
-#       check-deployable: ${{ steps.component-updates.outputs.check-deployable }}
-#       check-preprocess-proceed: ${{ steps.component-updates.outputs.check-preprocess-proceed }}
-#       data-preprocess: ${{ steps.component-updates.outputs.data-preprocess }}
-#       deploy: ${{ steps.component-updates.outputs.deploy }}
-#       evaluate: ${{ steps.component-updates.outputs.evaluate }}
-#       train: ${{ steps.component-updates.outputs.train }}
-#       update-deploy-config: ${{ steps.component-updates.outputs.update-deploy-config }}
     steps:
       - uses: actions/checkout@v2
       
@@ -48,6 +43,13 @@ jobs:
               - 'components/train/**'
             update-deploy-config:
               - 'components/update-deploy-config/**'
+              
+      - name: Check updated component is empty
+        env:
+          UPDATED: ${{ steps.filter.outputs.changes }}
+        run: |
+          echo UPDATED: $UPDATED
+          
     
   # This workflow contains a single job called "build"
   build:
