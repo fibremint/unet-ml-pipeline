@@ -79,6 +79,15 @@ def create_continuous_training_workflow():
     del workflow_dict['metadata']['generateName']
     workflow_dict['metadata']['name'] = 'continuous-training-template'
 
+    # Set artifactRepositoryRef
+    artifact_repository_dict = [
+        'key', 'default'
+    ]
+    # workflow_dict['spec']['artifactRepository'] = 'key: default'
+    workflow_dict['spec']['artifactRepositoryRef'] = {}
+    # workflow_dict['spec']['artifactRepository'].append(artifact_repository_dict)
+    workflow_dict['spec']['artifactRepositoryRef']['key'] = 'default'
+
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     output_path = os.path.join(curr_dir, '../resources/deployed/managed')
     workflow_filename = 'continuous-training-workflow-template.yml'
