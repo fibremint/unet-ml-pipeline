@@ -9,5 +9,6 @@ spec:
   concurrencyPolicy: "Replace"
   startingDeadlineSeconds: 0
   workflowSpec:
-    WorkflowTemplateRef:
+    arguments: {}
+    workflowTemplateRef:
       name: continuous-training-template
