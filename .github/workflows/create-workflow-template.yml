@@ -4,26 +4,18 @@ name: Create continuous training workflow template
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     paths:
       - 'pipeline/**'
-#  pull_request:
-#    branches: [ master ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   generate:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
       - uses: actions/setup-python@v2
@@ -43,25 +35,3 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Push by github actions
-#       - name: Push to origin
-#         run: |
-#           git config --global user.name ${{ github.actor }}
-#           git config --global user.email ${{ github.actor }}@users.noreply.github.com
-#           git add resources/deployed/managed/continuous-training-workflow-template.yml
-#           git commit -m "Push by github actions"
-#           git push origin HEAD:${{ github.ref }}
-
-        # export TAG="$(echo $GITHUB_REF | awk -F/ '{print $NF}')"
-
-        # git push origin HEAD:$TAG
-        # git push origin HEAD:${{ github.ref }}
-
-#       # Runs a single command using the runners shell
-#       - name: Run a one-line script
-#         run: echo Hello, world!
-
-#       # Runs a set of commands using the runners shell
-#       - name: Run a multi-line script
-#         run: |
-#           echo Add other actions to build,
-#           echo test, and deploy your project.
