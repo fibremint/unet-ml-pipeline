@@ -143,3 +143,5 @@ cython_debug/
 output/
 
 .idea/
+
+resources/deployed/managed/
