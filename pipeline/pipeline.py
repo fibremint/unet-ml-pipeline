@@ -13,6 +13,7 @@ def continuous_training_pipeline():
 
     eval_prediction_threshold = 0.5
 
+    cpu_limit '2000m'
     memory_limit = '6G'
 
     check_preprocess_proceed_task = ops.check_preprocess_proceed_op()
@@ -28,8 +29,8 @@ def continuous_training_pipeline():
                                  seed=seed)
 
         train_task.set_gpu_limit(gpu_num)
+        train_task.set_cpu_limit(cpu_limit)
         train_task.set_memory_limit(memory_limit)
-        # train_task.set_cpu_limit('1000m')
 
         train_task.after(data_preprocess_task)
         target_checkpoints_path = train_task.outputs['target_checkpoints_path']
@@ -37,8 +38,11 @@ def continuous_training_pipeline():
         eval_task = ops.evaluate_op(target_checkpoints_path=target_checkpoints_path,
                                    prediction_threshold=eval_prediction_threshold,
                                    seed=seed)
+        
         eval_task.set_gpu_limit(gpu_num)
+        eval_task.set_cpu_limit(cpu_limit)
         eval_task.set_memory_limit(memory_limit)
+        
         eval_task.after(train_task)
 
         target_checkpoints_path = eval_task.outputs['target_checkpoints_path']
