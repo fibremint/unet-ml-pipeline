@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-04-27T09:49:09.966120',
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-04-27T12:07:06.230150',
     pipelines.kubeflow.org/pipeline_spec: '{"name": "continuous-training-pipeline"}'}
   labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0}
   namespace: argo
@@ -156,7 +156,7 @@ spec:
         --prediction-threshold, '0.5', --seed, '42']
       image: asia.gcr.io/mlops-ai-platform-309312/nwd-evaluate
       resources:
-        limits: {nvidia.com/gpu: 1}
+        limits: {nvidia.com/gpu: 1, memory: 6G}
       volumeMounts:
       - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
     inputs:
@@ -244,7 +244,7 @@ spec:
         --seed, '42']
       image: asia.gcr.io/mlops-ai-platform-309312/nwd-train
       resources:
-        limits: {nvidia.com/gpu: 1}
+        limits: {nvidia.com/gpu: 1, memory: 6G}
       volumeMounts:
       - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
     outputs:
