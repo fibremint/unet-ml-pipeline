@@ -79,7 +79,11 @@ def create_continuous_training_workflow():
     del workflow_dict['metadata']['generateName']
     workflow_dict['metadata']['name'] = 'continuous-training-template'
 
-    if not os.path.exists('../output'):
-        os.makedirs('../output')
+    curr_dir = os.path.dirname(os.path.abspath(__file__))
+    output_path = os.path.join(curr_dir, '../resources/deployed/managed')
+    workflow_filename = 'continuous-training-workflow-template.yml'
 
-    compiler.Compiler._write_workflow(workflow_dict, '../output/continuous-training-workflow-template.yml')
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
+    compiler.Compiler._write_workflow(workflow_dict, os.path.join(output_path, workflow_filename))
