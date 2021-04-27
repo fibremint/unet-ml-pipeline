@@ -6,7 +6,11 @@ metadata:
 spec:
   # run at every 10 minutes
   schedule: "*/10 * * * *"
-  concurrencyPolicy: "Replace"
+  # prevent 'workflow shutdown with strategy: Terminate' for the previously running workflow.
+  # It's occurred when workflows are duplicated by a newly created workflow that scheduled on 
+  # the CronWorkflow
+  # ref: https://argoproj.github.io/argo-workflows/cron-workflows/#cronworkflow-options
+  concurrencyPolicy: "Forbid"
   startingDeadlineSeconds: 0
   workflowSpec:
     arguments: {}
