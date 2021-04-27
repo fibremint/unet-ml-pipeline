@@ -6,7 +6,7 @@ metadata:
   name: artifact-repositories
   namespace: argo  
 data:
-  artifactRepository: |
+  default-v1: |
     gcs:
       endpoint: storage.googleapis.com
       bucket: mlops-ai-platform-nwd
