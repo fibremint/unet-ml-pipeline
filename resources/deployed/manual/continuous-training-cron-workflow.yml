@@ -10,5 +10,5 @@ spec:
   startingDeadlineSeconds: 0
   workflowSpec:
     arguments: {}
-    WorkflowTemplateRef:
+    workflowTemplateRef:
       name: continuous-training-template
