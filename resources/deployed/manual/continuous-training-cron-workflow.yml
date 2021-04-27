@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: CronWorkflow
 metadata:
   namespace: argo
-  name: continuous-training
+  name: continuous-training-cron
 spec:
   # run at every 10 minutes
   schedule: "*/10 * * * *"
