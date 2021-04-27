@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-04-27T05:26:30.973961',
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-04-27T05:34:57.374364',
     pipelines.kubeflow.org/pipeline_spec: '{"name": "continuous-training-pipeline"}'}
   labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0}
   namespace: argo
@@ -13,7 +13,7 @@ spec:
     container:
       args: [--data-path, /opt/data/nwd-data, --target-checkpoints-path, '{{inputs.parameters.evaluate-target_checkpoints_path}}',
         --checkpoint-metrics-filename, '{{inputs.parameters.evaluate-checkpoint_metrics_filename}}']
-      image: None/None/nwd-check-deployable
+      image: asia.gcr.io/mlops-ai-platform-309312/nwd-check-deployable
       volumeMounts:
       - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
     inputs:
@@ -35,7 +35,7 @@ spec:
   - name: check-preprocess-proceed
     container:
       args: [--data-path, /opt/data/nwd-data]
-      image: None/None/nwd-check-preprocess-proceed
+      image: asia.gcr.io/mlops-ai-platform-309312/nwd-check-preprocess-proceed
       volumeMounts:
       - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
     outputs:
@@ -132,7 +132,7 @@ spec:
   - name: data-preprocess
     container:
       args: [--data-path, /opt/data/nwd-data, --preprocess-required-slide-paths, '{{inputs.parameters.check-preprocess-proceed-preprocess_required_slide_paths}}']
-      image: None/None/nwd-data-preprocess
+      image: asia.gcr.io/mlops-ai-platform-309312/nwd-data-preprocess
       volumeMounts:
       - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
     inputs:
@@ -144,7 +144,7 @@ spec:
   - name: deploy
     container:
       args: [--data-path, /opt/data/nwd-data]
-      image: None/None/nwd-deploy
+      image: asia.gcr.io/mlops-ai-platform-309312/nwd-deploy
       volumeMounts:
       - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
     volumes:
@@ -154,7 +154,7 @@ spec:
     container:
       args: [--data-path, /opt/data/nwd-data, --target-checkpoints-path, '{{inputs.parameters.train-target_checkpoints_path}}',
         --prediction-threshold, '0.5', --seed, '42']
-      image: None/None/nwd-evaluate
+      image: asia.gcr.io/mlops-ai-platform-309312/nwd-evaluate
       resources:
         limits: {nvidia.com/gpu: 1}
       volumeMounts:
@@ -242,7 +242,7 @@ spec:
     container:
       args: [--data-path, /opt/data/nwd-data, --batch-size, '64', --save-checkpoint,
         --seed, '42']
-      image: None/None/nwd-train
+      image: asia.gcr.io/mlops-ai-platform-309312/nwd-train
       resources:
         limits: {nvidia.com/gpu: 1}
       volumeMounts:
@@ -260,7 +260,7 @@ spec:
   - name: update-deploy-config
     container:
       args: [--data-path, /opt/data/nwd-data, --deployable-checkpoint-info, '{{inputs.parameters.check-deployable-deployable_checkpoint_info}}']
-      image: None/None/nwd-update-deploy-config
+      image: asia.gcr.io/mlops-ai-platform-309312/nwd-update-deploy-config
       volumeMounts:
       - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
     inputs:
