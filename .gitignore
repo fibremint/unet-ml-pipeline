@@ -144,4 +144,4 @@ output/
 
 .idea/
 
-resources/deployed/managed/
+# resources/deployed/managed/
