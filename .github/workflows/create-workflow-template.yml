@@ -36,7 +36,7 @@ jobs:
           
       - name: Generate workflow template
         run: |
-          python -m pipeline pipeline.create_continuous_training_workflow
+          python -c "import pipeline; pipeline.create_continuous_training_workflow()"
           
       - name: Push to origin
         run: |
