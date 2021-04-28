@@ -1,0 +1,275 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-04-28T16:48:39.087267',
+    pipelines.kubeflow.org/pipeline_spec: '{"name": "continuous-training-pipeline"}'}
+  labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0}
+  namespace: argo
+  name: continuous-training-template
+spec:
+  entrypoint: continuous-training-pipeline
+  templates:
+  - name: check-deployable
+    container:
+      args: [--data-path, /opt/data/nwd-data, --target-checkpoints-path, '{{inputs.parameters.evaluate-target_checkpoints_path}}',
+        --checkpoint-metrics-filename, '{{inputs.parameters.evaluate-checkpoint_metrics_filename}}']
+      image: <repo_base>/<gcp_project_id>/nwd-check-deployable
+      volumeMounts:
+      - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
+    inputs:
+      parameters:
+      - {name: evaluate-checkpoint_metrics_filename}
+      - {name: evaluate-target_checkpoints_path}
+    outputs:
+      parameters:
+      - name: check-deployable-deployable_checkpoint_info
+        valueFrom: {path: /tmp/deployable-checkpoint-info.json}
+      - name: check-deployable-is_deployable_checkpoint_exist
+        valueFrom: {path: /tmp/is-deployable-checkpoint-exist.txt}
+      artifacts:
+      - {name: check-deployable-deployable_checkpoint_info, path: /tmp/deployable-checkpoint-info.json}
+      - {name: check-deployable-is_deployable_checkpoint_exist, path: /tmp/is-deployable-checkpoint-exist.txt}
+    volumes:
+    - name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26
+      persistentVolumeClaim: {claimName: nfs-pv-claim}
+  - name: check-preprocess-proceed
+    container:
+      args: [--data-path, /opt/data/nwd-data]
+      image: <repo_base>/<gcp_project_id>/nwd-check-preprocess-proceed
+      volumeMounts:
+      - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
+    outputs:
+      parameters:
+      - name: check-preprocess-proceed-is_preprocess_required
+        valueFrom: {path: /tmp/is-preprocess-required.txt}
+      - name: check-preprocess-proceed-preprocess_required_slide_paths
+        valueFrom: {path: /tmp/preprocess-required-slide-paths.json}
+      artifacts:
+      - {name: check-preprocess-proceed-is_preprocess_required, path: /tmp/is-preprocess-required.txt}
+      - {name: check-preprocess-proceed-preprocess_required_slide_paths, path: /tmp/preprocess-required-slide-paths.json}
+    volumes:
+    - name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26
+      persistentVolumeClaim: {claimName: nfs-pv-claim}
+  - name: condition-exist-2
+    inputs:
+      parameters:
+      - {name: check-deployable-deployable_checkpoint_info}
+    dag:
+      tasks:
+      - name: deploy
+        template: deploy
+        dependencies: [update-deploy-config]
+      - name: update-deploy-config
+        template: update-deploy-config
+        arguments:
+          parameters:
+          - {name: check-deployable-deployable_checkpoint_info, value: '{{inputs.parameters.check-deployable-deployable_checkpoint_info}}'}
+  - name: condition-not-exist-3
+    dag:
+      tasks:
+      - {name: print-fn, template: print-fn}
+  - name: condition-preprocess-not-required-4
+    dag:
+      tasks:
+      - {name: print-fn-2, template: print-fn-2}
+  - name: condition-preprocess-required-1
+    inputs:
+      parameters:
+      - {name: check-preprocess-proceed-preprocess_required_slide_paths}
+    dag:
+      tasks:
+      - name: check-deployable
+        template: check-deployable
+        dependencies: [evaluate]
+        arguments:
+          parameters:
+          - {name: evaluate-checkpoint_metrics_filename, value: '{{tasks.evaluate.outputs.parameters.evaluate-checkpoint_metrics_filename}}'}
+          - {name: evaluate-target_checkpoints_path, value: '{{tasks.evaluate.outputs.parameters.evaluate-target_checkpoints_path}}'}
+      - name: condition-exist-2
+        template: condition-exist-2
+        when: '"{{tasks.check-deployable.outputs.parameters.check-deployable-is_deployable_checkpoint_exist}}"
+          == "True"'
+        dependencies: [check-deployable]
+        arguments:
+          parameters:
+          - {name: check-deployable-deployable_checkpoint_info, value: '{{tasks.check-deployable.outputs.parameters.check-deployable-deployable_checkpoint_info}}'}
+      - name: condition-not-exist-3
+        template: condition-not-exist-3
+        when: '"{{tasks.check-deployable.outputs.parameters.check-deployable-is_deployable_checkpoint_exist}}"
+          == "False"'
+        dependencies: [check-deployable]
+      - name: data-preprocess
+        template: data-preprocess
+        arguments:
+          parameters:
+          - {name: check-preprocess-proceed-preprocess_required_slide_paths, value: '{{inputs.parameters.check-preprocess-proceed-preprocess_required_slide_paths}}'}
+      - name: evaluate
+        template: evaluate
+        dependencies: [train]
+        arguments:
+          parameters:
+          - {name: train-target_checkpoints_path, value: '{{tasks.train.outputs.parameters.train-target_checkpoints_path}}'}
+      - name: train
+        template: train
+        dependencies: [data-preprocess]
+  - name: continuous-training-pipeline
+    dag:
+      tasks:
+      - {name: check-preprocess-proceed, template: check-preprocess-proceed}
+      - name: condition-preprocess-not-required-4
+        template: condition-preprocess-not-required-4
+        when: '"{{tasks.check-preprocess-proceed.outputs.parameters.check-preprocess-proceed-is_preprocess_required}}"
+          == "False"'
+        dependencies: [check-preprocess-proceed]
+      - name: condition-preprocess-required-1
+        template: condition-preprocess-required-1
+        when: '"{{tasks.check-preprocess-proceed.outputs.parameters.check-preprocess-proceed-is_preprocess_required}}"
+          == "True"'
+        dependencies: [check-preprocess-proceed]
+        arguments:
+          parameters:
+          - {name: check-preprocess-proceed-preprocess_required_slide_paths, value: '{{tasks.check-preprocess-proceed.outputs.parameters.check-preprocess-proceed-preprocess_required_slide_paths}}'}
+  - name: data-preprocess
+    container:
+      args: [--data-path, /opt/data/nwd-data, --preprocess-required-slide-paths, '{{inputs.parameters.check-preprocess-proceed-preprocess_required_slide_paths}}']
+      image: <repo_base>/<gcp_project_id>/nwd-data-preprocess
+      volumeMounts:
+      - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
+    inputs:
+      parameters:
+      - {name: check-preprocess-proceed-preprocess_required_slide_paths}
+    volumes:
+    - name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26
+      persistentVolumeClaim: {claimName: nfs-pv-claim}
+  - name: deploy
+    container:
+      args: [--data-path, /opt/data/nwd-data]
+      image: <repo_base>/<gcp_project_id>/nwd-deploy
+      volumeMounts:
+      - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
+    volumes:
+    - name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26
+      persistentVolumeClaim: {claimName: nfs-pv-claim}
+  - name: evaluate
+    container:
+      args: [--data-path, /opt/data/nwd-data, --target-checkpoints-path, '{{inputs.parameters.train-target_checkpoints_path}}',
+        --prediction-threshold, '0.5', --seed, '42']
+      image: <repo_base>/<gcp_project_id>/nwd-evaluate
+      resources:
+        limits: {nvidia.com/gpu: 1, cpu: 2000m, memory: 6G}
+      volumeMounts:
+      - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
+    inputs:
+      parameters:
+      - {name: train-target_checkpoints_path}
+    outputs:
+      parameters:
+      - name: evaluate-checkpoint_metrics_filename
+        valueFrom: {path: /tmp/checkpoint-metrics-filename.txt}
+      - name: evaluate-target_checkpoints_path
+        valueFrom: {path: /tmp/target-checkpoints-path.txt}
+      artifacts:
+      - {name: evaluate-checkpoint_metrics_filename, path: /tmp/checkpoint-metrics-filename.txt}
+      - {name: evaluate-target_checkpoints_path, path: /tmp/target-checkpoints-path.txt}
+    volumes:
+    - name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26
+      persistentVolumeClaim: {claimName: nfs-pv-claim}
+  - name: print-fn
+    container:
+      args: [--msg, 'deployed checkpoint: previous']
+      command:
+      - sh
+      - -ec
+      - |
+        program_path=$(mktemp)
+        printf "%s" "$0" > "$program_path"
+        python3 -u "$program_path" "$@"
+      - |
+        def _print_fn(msg):
+            print(msg)
+
+        import argparse
+        _parser = argparse.ArgumentParser(prog='Print fn', description='')
+        _parser.add_argument("--msg", dest="msg", type=str, required=True, default=argparse.SUPPRESS)
+        _parsed_args = vars(_parser.parse_args())
+
+        _outputs = _print_fn(**_parsed_args)
+      image: python:3.7
+    metadata:
+      annotations: {pipelines.kubeflow.org/component_spec: '{"implementation": {"container":
+          {"args": ["--msg", {"inputValue": "msg"}], "command": ["sh", "-ec", "program_path=$(mktemp)\nprintf
+          \"%s\" \"$0\" > \"$program_path\"\npython3 -u \"$program_path\" \"$@\"\n",
+          "def _print_fn(msg):\n    print(msg)\n\nimport argparse\n_parser = argparse.ArgumentParser(prog=''Print
+          fn'', description='''')\n_parser.add_argument(\"--msg\", dest=\"msg\", type=str,
+          required=True, default=argparse.SUPPRESS)\n_parsed_args = vars(_parser.parse_args())\n\n_outputs
+          = _print_fn(**_parsed_args)\n"], "image": "python:3.7"}}, "inputs": [{"name":
+          "msg"}], "name": "Print fn"}', pipelines.kubeflow.org/component_ref: '{}',
+        pipelines.kubeflow.org/arguments.parameters: '{"msg": "deployed checkpoint:
+          previous"}'}
+  - name: print-fn-2
+    container:
+      args: [--msg, all of the slides are pre-processed]
+      command:
+      - sh
+      - -ec
+      - |
+        program_path=$(mktemp)
+        printf "%s" "$0" > "$program_path"
+        python3 -u "$program_path" "$@"
+      - |
+        def _print_fn(msg):
+            print(msg)
+
+        import argparse
+        _parser = argparse.ArgumentParser(prog='Print fn', description='')
+        _parser.add_argument("--msg", dest="msg", type=str, required=True, default=argparse.SUPPRESS)
+        _parsed_args = vars(_parser.parse_args())
+
+        _outputs = _print_fn(**_parsed_args)
+      image: python:3.7
+    metadata:
+      annotations: {pipelines.kubeflow.org/component_spec: '{"implementation": {"container":
+          {"args": ["--msg", {"inputValue": "msg"}], "command": ["sh", "-ec", "program_path=$(mktemp)\nprintf
+          \"%s\" \"$0\" > \"$program_path\"\npython3 -u \"$program_path\" \"$@\"\n",
+          "def _print_fn(msg):\n    print(msg)\n\nimport argparse\n_parser = argparse.ArgumentParser(prog=''Print
+          fn'', description='''')\n_parser.add_argument(\"--msg\", dest=\"msg\", type=str,
+          required=True, default=argparse.SUPPRESS)\n_parsed_args = vars(_parser.parse_args())\n\n_outputs
+          = _print_fn(**_parsed_args)\n"], "image": "python:3.7"}}, "inputs": [{"name":
+          "msg"}], "name": "Print fn"}', pipelines.kubeflow.org/component_ref: '{}',
+        pipelines.kubeflow.org/arguments.parameters: '{"msg": "all of the slides are
+          pre-processed"}'}
+  - name: train
+    container:
+      args: [--data-path, /opt/data/nwd-data, --batch-size, '64', --save-checkpoint,
+        --seed, '42']
+      image: <repo_base>/<gcp_project_id>/nwd-train
+      resources:
+        limits: {nvidia.com/gpu: 1, cpu: 2000m, memory: 6G}
+      volumeMounts:
+      - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
+    outputs:
+      parameters:
+      - name: train-target_checkpoints_path
+        valueFrom: {path: /tmp/target-checkpoints-path.txt}
+      artifacts:
+      - {name: train-is_checkpoint_eval_required, path: /tmp/is-checkpoint-eval-required.txt}
+      - {name: train-target_checkpoints_path, path: /tmp/target-checkpoints-path.txt}
+    volumes:
+    - name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26
+      persistentVolumeClaim: {claimName: nfs-pv-claim}
+  - name: update-deploy-config
+    container:
+      args: [--data-path, /opt/data/nwd-data, --deployable-checkpoint-info, '{{inputs.parameters.check-deployable-deployable_checkpoint_info}}']
+      image: <repo_base>/<gcp_project_id>/nwd-update-deploy-config
+      volumeMounts:
+      - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
+    inputs:
+      parameters:
+      - {name: check-deployable-deployable_checkpoint_info}
+    volumes:
+    - name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26
+      persistentVolumeClaim: {claimName: nfs-pv-claim}
+  arguments:
+    parameters: []
+  serviceAccountName: default
+  artifactRepositoryRef: {key: default}
