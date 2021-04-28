@@ -1,8 +1,9 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-04-28T16:48:39.087267',
-    pipelines.kubeflow.org/pipeline_spec: '{"name": "continuous-training-pipeline"}'}
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-04-28T17:42:03.521311',
+    pipelines.kubeflow.org/pipeline_spec: '{"name": "continuous-training-pipeline"}',
+    avp_path: avp/nwd-pipeline-continuous-training}
   labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0}
   namespace: argo
   name: continuous-training-template
