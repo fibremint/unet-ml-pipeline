@@ -1,10 +1,6 @@
-import os
-
 from kfp import dsl, components
 
-REPO_BASE = os.environ.get('REPO_BASE')
-GCP_PROJECT_ID = os.environ.get('GCP_PROJECT_ID')
-REPO_ADDRESS = f'{REPO_BASE}/{GCP_PROJECT_ID}'
+REPO_ADDRESS = '<repo_base>/<gcp_project_id>'
 
 DATA_PATH = '/opt/data/nwd-data'
 VOL_PVC_NAME = 'nfs-pv-claim'
