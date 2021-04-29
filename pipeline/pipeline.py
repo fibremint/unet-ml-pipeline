@@ -95,7 +95,7 @@ def create_continuous_training_workflow():
 
     # add annotations to get secured value from vault
     # ref: https://itnext.io/argocd-secret-management-with-argocd-vault-plugin-539f104aff05
-    workflow_dict['metadata']['annotations']['avp_path'] = 'avp/nwd-pipeline-continuous-training'
+    workflow_dict['metadata']['annotations']['avp_path'] = 'avp/data/nwd-pipeline-continuous-training'
 
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     output_path = os.path.join(curr_dir, '../resources/deployed/managed')
