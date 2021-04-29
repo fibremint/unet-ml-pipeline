@@ -8,7 +8,6 @@ metadata:
   annotations:
     deployment.kubernetes.io/revision: "12"
   creationTimestamp: "2021-04-21T04:55:39Z"
-  generation: 27
   labels:
     app.kubernetes.io/component: repo-server
     app.kubernetes.io/name: argocd-repo-server
