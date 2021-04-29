@@ -98,7 +98,7 @@ def create_continuous_training_workflow():
     workflow_dict['metadata']['annotations']['avp_path'] = 'avp/data/nwd-pipeline-continuous-training'
 
     curr_dir = os.path.dirname(os.path.abspath(__file__))
-    output_path = os.path.join(curr_dir, '../resources/deployed/managed')
+    output_path = os.path.join(curr_dir, '../resources/deployed')
     workflow_filename = 'continuous-training-workflow-template.yml'
 
     if not os.path.exists(output_path):
