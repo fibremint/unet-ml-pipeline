@@ -99,7 +99,7 @@ def create_continuous_training_workflow():
 
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     output_path = os.path.join(curr_dir, '../resources/deployed')
-    workflow_filename = 'continuous-training-workflow-template.yml'
+    workflow_filename = 'managed-continuous-training-workflow-template.yml'
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
