@@ -1,36 +1,16 @@
+# MLOps Pipeline Components
 
-# Data directory structure
-```
-.
-├── preprocess-checkpoint.json  - (auto generated)
-├── preprocess-metadata         - (auto generated)
-│   ├── 2_00223_sub0.svs.json
-│   ├── 2_00225_sub0.svs.json
-│   └── ...
-├── region-annotation
-│   ├── negative
-│   │   ├── 1_00061_sub0
-│   │   ├── 1_00062_sub0
-│   │   └── ...
-│   └── positive
-│       ├── 1_00061_sub0
-│       ├── 1_00062_sub0
-│       └── ...
-├── slide
-│   ├── test
-│   │   └── 2_00232_sub0.svs
-│   └── train
-│       ├── 2_00223_sub0.svs
-│       ├── 2_00225_sub0.svs
-│       ├── 2_00225_sub1.svs
-│       ├── 2_00245_sub0.svs
-│       └── 2_00248_sub0.svs
-└── slide-patch                - (auto generated)
-    └── train
-        ├── ground-truth
-        └── image
+This components are the modules that used in the pipeline that conducts continuous training which based on argo workflow. The workflow proceeds each of the steps by pulling the container image that required on a specific task.
 
-```
+## Continuous Deployment with GitHub Actions
 
-# Reference
+The tasks that defined in a workflow proceeds its own job by pulling the container image that published on the Container Registry.
+
+This deployment process like building a module, writing some specific tag to image and push to the remote repository could be fulfilled manually on a local development machine. However, deployment can be processed automatically on the this component repository with GitHub Actions. 
+
+The deployment workflow do build and publish only for updated components. It looks at component path and detects changes by comparing to the previous commits. This deployment process would be applied to the each of updated modules.
+
+## References
+
 https://github.com/zizhaozhang/nmi-wsi-diagnosis
+
