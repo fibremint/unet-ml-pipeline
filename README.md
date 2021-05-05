@@ -16,9 +16,21 @@ The storage that has dataset and where the trained model saved is served with NF
 
 And `dsl.ContainerOp` from `kfp` has an argument `pvolumes` that set path and `dsl.PipelineVolume` with a persistent volume claim of the storage from NFS server. The module that running at the docker container would had a mounted volume, and could do read and write behavior like on the local filesystem.
 
-### Storage Structure
+### Storage structure
+* **mode-checkpoint**: The path where checkpoint from training and metrics are saved
+* **mdoel-deploy-config.json**: Configuration of model deployment
+* **preprocess-checkpoint.json**: A list of slide filename that pre-processed
+* **preprocess-metadata**: The path where pre-process metatdata which shows slide filename and related pre-processed image patches, are saved
+* **region-annotation**: Annotation directory used for slide pre-processing
+* **slide**: Slide directory
+* **slide-patch**: The path where pre-processed data are saved or used for training and evaluation
 ```
 .
+├── model-checkpoint            - (generated automatically)
+│   ├── 20210422-141741
+│   ├── 20210422-144311
+│   └── ...
+├── model-deploy-config.json    - (generated automatically)
 ├── preprocess-checkpoint.json  - (generated automatically)
 ├── preprocess-metadata         - (generated automatically)
 │   ├── 2_00223_sub0.svs.json
@@ -42,11 +54,13 @@ And `dsl.ContainerOp` from `kfp` has an argument `pvolumes` that set path and `d
 │       ├── 2_00225_sub1.svs
 │       ├── 2_00245_sub0.svs
 │       └── 2_00248_sub0.svs
-├── slide-patch                - (generated automatically)
-├── train
-├── ground-truth
-└── image
-
+└── slide-patch                 - (generated automatically)
+    ├── test
+    │   │── ground-truth
+    │   └── image
+    └── train
+        ├── ground-truth
+        └── image
 ```
 
 ## Secure the value with HashiCorp Vault
