@@ -84,13 +84,7 @@ def create_continuous_training_workflow():
     del workflow_dict['metadata']['generateName']
     workflow_dict['metadata']['name'] = 'continuous-training-template'
 
-    # Set artifactRepositoryRef
-    artifact_repository_dict = [
-        'key', 'default'
-    ]
-    # workflow_dict['spec']['artifactRepository'] = 'key: default'
     workflow_dict['spec']['artifactRepositoryRef'] = {}
-    # workflow_dict['spec']['artifactRepository'].append(artifact_repository_dict)
     workflow_dict['spec']['artifactRepositoryRef']['key'] = 'default'
 
     # add annotations to get secured value from vault
