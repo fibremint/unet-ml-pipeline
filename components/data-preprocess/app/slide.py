@@ -1,3 +1,4 @@
+import logging
 import json
 import os
 import uuid
@@ -92,7 +93,13 @@ def _slide_patch_generator(slide_path,
         min_h, max_h = np.min(annotation_coords[0, :]), np.max(annotation_coords[0, :])
         min_w, max_w = np.min(annotation_coords[1, :]), np.max(annotation_coords[1, :])
 
-        annotation_polygon = poly_transform.np_arr_to_poly(np.asarray(annotation_coords))
+        try:
+            annotation_polygon = poly_transform.np_arr_to_poly(np.asarray(annotation_coords))
+        except ValueError as e:
+            logging.error(f'Failed to transform coordinates to polygon, this will be skipped,'
+                          f' slide_name: {slide_name}, region: {curr_annotation_region}')
+            logging.error(f'Exception: {e}')
+            continue
 
         patch_generate_try_cnt = 0
         while patch_generate_try_cnt < opt.patch_gen_try_num:
