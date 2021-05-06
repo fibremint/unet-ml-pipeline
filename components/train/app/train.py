@@ -82,7 +82,7 @@ def train_model(checkpoints_path):
         print(f'epoch ({idx_epoch+1}/{opt.epoch}) '
               f'learning-rate: {format(learning_rate, ".7f")} '
               f'loss: {format(train_loss.result(), ".7f")} '
-              f'mean-iou: {format(train_mean_iou.result(), ".7f")}')
+              f'mean-iou: {format(train_mean_iou.result(), ".7f")}', flush=True)
 
         if opt.is_save_checkpoint:
             checkpoint_name = f'checkpoint-epoch-{idx_epoch+1}'

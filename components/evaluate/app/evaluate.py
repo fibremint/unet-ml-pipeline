@@ -66,7 +66,7 @@ def evaluate_model(target_checkpoints_path,
 
         print(f'evaluate ({idx_checkpoint+1}/{checkpoints_num}) '
               f'loss: {format(test_loss.result(), ".7f")} '
-              f'mean-iou: {format(test_mean_iou.result(), ".7f")}')
+              f'mean-iou: {format(test_mean_iou.result(), ".7f")}', flush=True)
 
         eval_checkpoint_dict[curr_checkpoint_name]['loss'] = float(test_loss.result().numpy())
         eval_checkpoint_dict[curr_checkpoint_name]['mean_iou'] = float(test_mean_iou.result().numpy())
