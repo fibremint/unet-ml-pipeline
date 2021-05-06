@@ -13,8 +13,8 @@ def continuous_training_pipeline():
 
     eval_prediction_threshold = 0.5
 
-    cpu_limit = '2000m'
-    memory_limit = '6G'
+    cpu_limit = '3000m'
+    memory_limit = '12G'
 
     check_preprocess_proceed_task = ops.check_preprocess_proceed_op()
     is_preprocess_required = check_preprocess_proceed_task.outputs['is_preprocess_required']
