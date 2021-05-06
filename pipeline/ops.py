@@ -47,7 +47,7 @@ def train_op(batch_size: int, seed: int):
                    '--batch-size', batch_size,
                    '--save-checkpoint',
                    '--seed', seed,
-                   '--dataset-cache'],
+                   '--lr-decay'],
         file_outputs={'target_checkpoints_path': '/tmp/target-checkpoints-path.txt',
                       'is_checkpoint_eval_required': '/tmp/is-checkpoint-eval-required.txt'},
         pvolumes={'/opt/data': dsl.PipelineVolume(pvc=VOL_PVC_NAME)}
@@ -65,8 +65,7 @@ def evaluate_op(target_checkpoints_path: str, prediction_threshold, seed: int):
         arguments=['--data-path', DATA_PATH,
                    '--target-checkpoints-path', target_checkpoints_path,
                    '--prediction-threshold', prediction_threshold,
-                   '--seed', seed,
-                   '--dataset-cache'],
+                   '--seed', seed],
         file_outputs={'target_checkpoints_path': '/tmp/target-checkpoints-path.txt',
                       'checkpoint_metrics_filename': '/tmp/checkpoint-metrics-filename.txt'},
         pvolumes={'/opt/data': dsl.PipelineVolume(pvc=VOL_PVC_NAME)}
