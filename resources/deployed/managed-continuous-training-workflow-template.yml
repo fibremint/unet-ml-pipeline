@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-05-06T09:39:32.220569',
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-05-06T10:48:04.380298',
     pipelines.kubeflow.org/pipeline_spec: '{"name": "continuous-training-pipeline"}',
     avp_path: avp/data/nwd-pipeline-continuous-training}
   labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0}
@@ -154,7 +154,7 @@ spec:
   - name: evaluate
     container:
       args: [--data-path, /opt/data/nwd-data, --target-checkpoints-path, '{{inputs.parameters.train-target_checkpoints_path}}',
-        --prediction-threshold, '0.5', --seed, '42', --dataset-cache]
+        --prediction-threshold, '0.5', --seed, '42']
       image: <repo_base>/<gcp_project_id>/nwd-evaluate
       resources:
         limits: {nvidia.com/gpu: 1, cpu: 3000m, memory: 12G}
@@ -242,7 +242,7 @@ spec:
   - name: train
     container:
       args: [--data-path, /opt/data/nwd-data, --batch-size, '64', --save-checkpoint,
-        --seed, '42', --dataset-cache]
+        --seed, '42', --lr-decay]
       image: <repo_base>/<gcp_project_id>/nwd-train
       resources:
         limits: {nvidia.com/gpu: 1, cpu: 3000m, memory: 12G}
