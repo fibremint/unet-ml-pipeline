@@ -98,7 +98,7 @@ def _load_test_data(image_path, image_size):
 def _prepare_train_dataset(dataset: tf.data.Dataset, batch_size, cache_path='', shuffle_buffer_size=1000):
     if cache_path != '':
         cache_filename = 'dataset_train.tfcache'
-        dataset = dataset.cache(os.path.join(cache_path, cache_filename))
+        dataset = dataset.cache(os.path.join(opt.data_path, cache_path, cache_filename))
         # dataset = dataset.cache(''.join([cache_path, '/', cache_filename]))
 
     dataset = dataset.shuffle(buffer_size=shuffle_buffer_size)
@@ -117,7 +117,7 @@ def _prepare_train_dataset(dataset: tf.data.Dataset, batch_size, cache_path='', 
 def _prepare_test_dataset(dataset: tf.data.Dataset, batch_size, cache_path=''):
     if cache_path != '':
         cache_filename = 'dataset_test.tfcache'
-        dataset = dataset.cache(os.path.join(cache_path, cache_filename))
+        dataset = dataset.cache(os.path.join(opt.data_path, cache_path, cache_filename))
         # dataset = dataset.cache(''.join([cache_path, '/', cache_filename]))
 
     dataset = dataset.repeat()

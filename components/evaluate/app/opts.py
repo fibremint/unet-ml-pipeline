@@ -16,7 +16,7 @@ parser.add_argument('--batch-size', type=int, default=16, help='input batch size
 parser.add_argument('--dataset-cache', dest='is_use_dataset_cache', action='store_true')
 parser.add_argument('--no-dataset-cache', dest='is_use_dataset_cache', action='store_false')
 parser.set_defaults(is_use_dataset_cache=False)
-parser.add_argument('--dataset-cache-path', type=str, default='.', help='path where dataset cache is stored')
+parser.add_argument('--dataset-cache-path', type=str, default='./', help='path where dataset cache is stored')
 
 parser.add_argument('--image_size', type=int, default=256, help='then crop to this size')
 parser.add_argument('--num-class', type=int, default=2, help='# of classes')
