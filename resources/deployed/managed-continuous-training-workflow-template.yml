@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-05-06T06:29:19.133247',
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-05-06T09:39:32.220569',
     pipelines.kubeflow.org/pipeline_spec: '{"name": "continuous-training-pipeline"}',
     avp_path: avp/data/nwd-pipeline-continuous-training}
   labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0}
@@ -157,7 +157,7 @@ spec:
         --prediction-threshold, '0.5', --seed, '42', --dataset-cache]
       image: <repo_base>/<gcp_project_id>/nwd-evaluate
       resources:
-        limits: {nvidia.com/gpu: 1, cpu: 2000m, memory: 6G}
+        limits: {nvidia.com/gpu: 1, cpu: 3000m, memory: 12G}
       volumeMounts:
       - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
     inputs:
@@ -245,7 +245,7 @@ spec:
         --seed, '42', --dataset-cache]
       image: <repo_base>/<gcp_project_id>/nwd-train
       resources:
-        limits: {nvidia.com/gpu: 1, cpu: 2000m, memory: 6G}
+        limits: {nvidia.com/gpu: 1, cpu: 3000m, memory: 12G}
       volumeMounts:
       - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
     outputs:
