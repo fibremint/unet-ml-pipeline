@@ -71,5 +71,17 @@ With the HashiCorp Vault and argocd-vault-plugin, the private value from the res
 
 The secured resource that had to be parsed has annotation `avp_path` that describes path where the secured value could be retrieved from the Vault. Argocd has a plugin for replacing the secured value to original value that stored on the Vault. And Argocd can acquire plain kubernetes resource that applicable. 
 
-# Reference
-https://github.com/zizhaozhang/nmi-wsi-diagnosis
+## Reference
+* Original codes: https://github.com/zizhaozhang/nmi-wsi-diagnosis
+* Pipeline with GPU: https://github.com/kubeflow/pipelines/issues/3313
+* argocd-vault-plugin: https://github.com/IBM/argocd-vault-plugin
+* argocd-vault-plugin configuration: https://itnext.io/argocd-secret-management-with-argocd-vault-plugin-539f104aff05
+* Vault approle configuration: https://www.vaultproject.io/docs/auth/approle
+* NFS service configuration: https://medium.com/scientific-breakthrough-of-the-afternoon/set-up-your-own-private-cloud-storage-with-nfs-and-google-compute-engine-c67ab9667b5b
+* Artifact repostiroy configuration: https://github.com/argoproj/argo-workflows/blob/master/docs/configure-artifact-repository.md
+* Configure workload identity to cluster: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+
+### Troubleshoot
+* https://github.com/IBM/argocd-vault-plugin/issues/47
+* https://github.com/IBM/argocd-vault-plugin/issues/103
+* controller is not configured with a default... https://www.programmersought.com/article/496034877/
