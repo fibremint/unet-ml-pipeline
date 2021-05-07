@@ -1,5 +1,7 @@
 
 # Continuous Training Pipeline
+![pipeline](https://github.com/lunarbridge/nwd-pipeline-continuous-training/blob/master/assets/pipeline-graph.png)
+
 This repository manages resources (`workflowTemplate`, `CronWorkflow`) which used in the pipeline of an Argo Workflow. CD (Continuous Deployment) could be proceed with Argocd that reads resources from resources directory and sync them to Argo Workflow.
 
 `WorkflowTemplate` is a resource that defines pipeline and could be used to run workflow with reusability. `CronWorkflow` runs specific workflow that given at workflowTemplateRef regularly. The continuous training could be fulfilled regularly with this resources.
