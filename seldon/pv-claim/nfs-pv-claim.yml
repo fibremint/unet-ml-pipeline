@@ -2,12 +2,12 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: nfs-pv-claim
-  namespace: 'argo'
+  namespace: 'seldon'
 spec:
   accessModes:
     - ReadWriteMany
   storageClassName: ""
-  volumeName: "nfs-pv-argo"
+  volumeName: "nfs-pv-seldon"
   resources:
     requests:
       storage: 200Gi
