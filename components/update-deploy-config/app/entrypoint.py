@@ -34,7 +34,7 @@ def main():
 
     model_save_path = os.path.join(model_serve_path, str(latest_model_version + 1))
     print(f'msp: {model_save_path}')
-    load_weight_path = os.path.join(opt.data_path, deployable_checkpoint_dict['checkpoint_path'])
+    load_weight_path = os.path.join(opt.data_path, deployable_checkpoint_dict['checkpoint_path'] + '.h5')
     print(f'lwp: {load_weight_path}')
 
     model = UNet().create_model(img_shape=[256, 256, 3], num_class=2, rate=.0)
