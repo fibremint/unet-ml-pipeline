@@ -5,8 +5,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    deployment.kubernetes.io/revision: "12"
+#   annotations:
+#     deployment.kubernetes.io/revision: "12"
   creationTimestamp: "2021-04-21T04:55:39Z"
   labels:
     app.kubernetes.io/component: repo-server
