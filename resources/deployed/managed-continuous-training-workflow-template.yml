@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-05-06T10:48:04.380298',
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0, pipelines.kubeflow.org/pipeline_compilation_time: '2021-05-25T12:25:59.188254',
     pipelines.kubeflow.org/pipeline_spec: '{"name": "continuous-training-pipeline"}',
     avp_path: avp/data/nwd-pipeline-continuous-training}
   labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.4.0}
@@ -260,7 +260,8 @@ spec:
       persistentVolumeClaim: {claimName: nfs-pv-claim}
   - name: update-deploy-config
     container:
-      args: [--data-path, /opt/data/nwd-data, --deployable-checkpoint-info, '{{inputs.parameters.check-deployable-deployable_checkpoint_info}}']
+      args: [--data-path, /opt/data/nwd-data, --seldon-model-path, /opt/data/seldon-model,
+        --deployable-checkpoint-info, '{{inputs.parameters.check-deployable-deployable_checkpoint_info}}']
       image: <repo_base>/<gcp_project_id>/nwd-update-deploy-config
       volumeMounts:
       - {mountPath: /opt/data, name: pvolume-afd47405dd14648afcc5a82147f29bbb96bb240f7052ca0e8836f26}
