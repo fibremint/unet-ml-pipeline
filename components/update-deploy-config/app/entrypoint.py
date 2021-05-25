@@ -1,7 +1,9 @@
 import datetime
+import glob
 import json
 import os
 
+from model import UNet
 from opts import opt
 
 
@@ -18,6 +20,15 @@ def main():
 
     with open(model_deploy_config_path, 'w') as f:
         f.write(json.dumps(model_deploy_config))
+
+    model_serve_path = os.path.join(opt.seldon_model_path, 'nwd')
+    latest_model_version = max([int(os.path.relpath(g, model_serve_path))
+                                for g in glob.glob(model_serve_path + '/*')])
+    model_save_path = os.path.join(model_serve_path, str(latest_model_version + 1))
+
+    model = UNet().create_model(img_shape=[256, 256, 3], num_class=2, rate=.0)
+    model.load_weights(deployable_checkpoint_dict['checkpoint_path'])
+    model.save(model_save_path)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-FROM python:3.9-alpine
+FROM tensorflow/tensorflow:2.4.1-gpu
 
 RUN mkdir /workspace
 WORKDIR /workspace
