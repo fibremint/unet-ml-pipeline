@@ -22,8 +22,16 @@ def main():
         f.write(json.dumps(model_deploy_config))
 
     model_serve_path = os.path.join(opt.seldon_model_path, 'nwd')
-    latest_model_version = max([int(os.path.relpath(g, model_serve_path))
-                                for g in glob.glob(model_serve_path + '/*')])
+    if not os.path.exists(model_serve_path):
+        os.makedirs(model_serve_path)
+
+    saved_model_paths = glob.glob(model_serve_path + '/*')
+    if len(saved_model_paths) > 0:
+        latest_model_version = max([int(os.path.relpath(g, model_serve_path))
+                                    for g in glob.glob(model_serve_path + '/*')])
+    else:
+        latest_model_version = 0
+
     model_save_path = os.path.join(model_serve_path, str(latest_model_version + 1))
 
     model = UNet().create_model(img_shape=[256, 256, 3], num_class=2, rate=.0)
