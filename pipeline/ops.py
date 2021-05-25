@@ -3,6 +3,7 @@ from kfp import dsl, components
 REPO_ADDRESS = '<repo_base>/<gcp_project_id>'
 
 DATA_PATH = '/opt/data/nwd-data'
+SELDON_MODEL_PATH = '/opt/data/seldon-model'
 VOL_PVC_NAME = 'nfs-pv-claim'
 
 
@@ -98,6 +99,7 @@ def update_deploy_config_op(deployable_checkpoint_info: str):
         name='update-deploy-config',
         image=f'{REPO_ADDRESS}/nwd-update-deploy-config',
         arguments=['--data-path', DATA_PATH,
+                   '--seldon-model-path', SELDON_MODEL_PATH,
                    '--deployable-checkpoint-info', deployable_checkpoint_info],
         pvolumes={'/opt/data': dsl.PipelineVolume(pvc=VOL_PVC_NAME)}
     )
