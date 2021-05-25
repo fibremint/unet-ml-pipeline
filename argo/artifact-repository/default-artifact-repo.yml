@@ -5,6 +5,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: artifact-repositories
+  namespace: argocd
 data:
   default: |
     gcs:
