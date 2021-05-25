@@ -21,7 +21,7 @@ def main():
     with open(model_deploy_config_path, 'w') as f:
         f.write(json.dumps(model_deploy_config))
 
-    model_serve_path = os.path.join(opt.seldon_model_path, 'nwd')
+    model_serve_path = os.path.join(opt.data_path, opt.seldon_model_path, 'nwd')
     if not os.path.exists(model_serve_path):
         os.makedirs(model_serve_path)
 
@@ -33,6 +33,7 @@ def main():
         latest_model_version = 0
 
     model_save_path = os.path.join(model_serve_path, str(latest_model_version + 1))
+    print(f'msp: {model_save_path}')
 
     model = UNet().create_model(img_shape=[256, 256, 3], num_class=2, rate=.0)
     model.load_weights(deployable_checkpoint_dict['checkpoint_path'])
