@@ -23,7 +23,7 @@ And `dsl.ContainerOp` from `kfp` has an argument `pvolumes` that set path and `d
 
 ### Storage structure
 * **mode-checkpoint**: The path where checkpoint from training and metrics are saved
-* **mdoel-deploy-config.json**: Configuration of model deployment
+* **model-deploy-config.json**: Configuration of model deployment
 * **preprocess-checkpoint.json**: A list of slide filename that pre-processed
 * **preprocess-metadata**: The path where pre-process metatdata which shows slide filename and related pre-processed image patches, are saved
 * **region-annotation**: Annotation directory used for slide pre-processing
