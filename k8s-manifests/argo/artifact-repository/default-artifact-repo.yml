@@ -1,0 +1,15 @@
+# ref: https://github.com/argoproj/argo-workflows/blob/v2.12.11/docs/artifact-repository-ref.md
+# compatible with Argo workflow v2.12.11
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: artifact-repositories
+  namespace: argo
+data:
+  default: |
+    gcs:
+      endpoint: storage.googleapis.com
+      bucket: mlops-ai-platform-nwd
+      region: asia-northeast3
+      insecure: true
