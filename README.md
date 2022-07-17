@@ -6,6 +6,9 @@ This repository manages resources (`workflowTemplate`, `CronWorkflow`) which use
 
 `WorkflowTemplate` is a resource that defines pipeline and could be used to run workflow with reusability. `CronWorkflow` runs specific workflow that given at workflowTemplateRef regularly. The continuous training could be fulfilled regularly with this resources.
 
+## Architecture
+![architecture](assets/architecture.png)
+
 ## Generate continuous training pipeline with Kubeflow Pipeline SDK
 
 As an Argo Workflow pipeline is kubernetes resources, definition of this would be time consuming task and takes effort for pipeline management, especially for complex pipeline. However, with the introduction of KFP (Kubeflow Pipeline SDK) it would be ease the hardness of the pipeline development and management.
