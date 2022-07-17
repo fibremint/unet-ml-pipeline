@@ -1,0 +1,106 @@
+name: Push changed components to Google Container Registry
+
+# Controls when the action will run. 
+on:
+  push:
+     paths:
+       - 'components/**'
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  check-updated-components:
+    name: Check component updates
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.filter.outputs.changes }}
+      is_none_of_updates: ${{ steps.check.outputs.is_none_of_updates }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            check-deployable:
+              - 'components/check-deployable/**'
+            check-preprocess-proceed:
+              - 'components/check-preprocess-proceed/**'
+            data-preprocess:
+              - 'components/data-preprocess/**'
+            deploy:
+              - 'components/deploy/**'
+            evaluate:
+              - 'components/evaluate/**'
+            train:
+              - 'components/train/**'
+            update-deploy-config:
+              - 'components/update-deploy-config/**'
+
+      - name: Check updated component is empty
+        id: check
+        env:
+          UPDATED: ${{ steps.filter.outputs.changes }}
+        run: |
+          echo UPDATED: $UPDATED
+          if [ "[]" == "$UPDATED" ]; then echo "::set-output name=is_none_of_updates::true"
+          else echo "::set-output name=is_none_of_updates::false"
+          fi
+
+  build-push:
+    name: Build and push the image
+    runs-on: ubuntu-latest
+
+    needs: check-updated-components
+    if: ${{ needs.check-updated-components.outputs.is_none_of_updates == 'false' }}
+    strategy:
+      matrix:
+        package: ${{ fromJSON(needs.check-updated-components.outputs.packages) }}
+
+    env:
+      IMAGE_NS: nwd
+      GITHUB_SHA: ${{ github.sha }}
+      GITHUB_REF: ${{ github.ref }}
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # setup gcloud CLI
+      - name: Setup GCP CLI
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      # configure docker
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker
+
+      - name: Define environment variable
+        run: |
+          echo $GITHUB_REF | awk -F/ '{print $NF}' > TAG
+          echo ${{ secrets.REPO_BASE }}/${{ secrets.GCP_PROJECT_ID }}/"$IMAGE_NS"-${{ matrix.package }} > IMAGE
+
+      # Build the docker image
+      - name: Build
+        run: |
+          docker build ./components/${{ matrix.package }} \
+            -t $(cat IMAGE):$(cat TAG) \
+            --build-arg GITHUB_SHA="$GITHUB_SHA" \
+            --build-arg GITHUB_REF="$GITHUB_REF"
+
+      # Push to Google Container Registry
+      - name: Publish
+        run: |
+          docker push $(cat IMAGE):$(cat TAG)
+          docker tag $(cat IMAGE):$(cat TAG) \
+                     $(cat IMAGE):latest
+          docker push $(cat IMAGE):latest
