@@ -2,6 +2,16 @@
 
 This components are the modules that used in the pipeline that conducts continuous training which based on argo workflow. The workflow proceeds each of the steps by pulling the container image that required on a specific task.
 
+## Components
+
+* **check-deployable**: Compares the metric between previously deployed model and another one that trained on the pipeline. If trained model’s performance (accuracy) is better, it would be designated as to be deployed.
+* **check-preprocess-proceed**: The newly added data have to be pre-processed. This module checks whether data were added to data storage or not, and outputs its checked result.
+* **data-preprocess**: Generates image patches and corresponding mask image with a size of 256x256
+* **deploy**: Simply shows the information of deployment configuration.
+* **evaluate** : Evaluates the trained model.
+* **train** : Train a model.
+* **update-deploy-config**: Updates deployment configuration with the  designated model.
+
 ## Continuous Deployment with GitHub Actions
 
 The tasks that defined in a workflow proceeds its own job by pulling the container image that published on the Container Registry.
